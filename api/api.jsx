@@ -9,7 +9,7 @@ function jwtDecodeSafe(token) {
 }
 
 const api = axios.create({
-    baseURL: "https://bus-ticket-booking-backend-gkz6.onrender.com/api",
+    baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
 api.interceptors.request.use(async (config) => {
