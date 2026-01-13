@@ -1,3 +1,4 @@
+// filepath: c:\Users\KAMAL TAMIL\Documents\booking-task\frontend\Components\Booking.jsx
 import React, { useState, useEffect } from 'react'
 import api from '../api/api'
 import { useNavigate } from 'react-router-dom'
@@ -7,63 +8,116 @@ import { DataContext } from '../Context/DataContext'
 
 const Booking = () => {
   const [form, setForm] = useState({ bus: '', seats: 1, notes: '', start_location: '', drop_location: '', travel_date: '' })
+  const [routes, setRoutes] = useState([])
   const [buses, setBuses] = useState([])
   const [selectedBus, setSelectedBus] = useState(null)
   const [loading, setLoading] = useState(false)
   const [bookingPrice, setBookingPrice] = useState(0)
+  const [step, setStep] = useState(1)
+  const [uniqueCities, setUniqueCities] = useState({ origins: [], destinations: [] })
   const navigate = useNavigate()
   const { user } = useContext(DataContext)
+
+  // Load all routes on component mount
+  useEffect(() => {
+    let mounted = true
+    const loadRoutes = async () => {
+      try {
+        const res = await api.get('/routes/')
+        if (!mounted) return
+        setRoutes(res.data)
+        
+        // Extract unique origin and destination cities
+        const origins = new Set()
+        const destinations = new Set()
+        res.data.forEach(route => {
+          origins.add(route.origin_city)
+          destinations.add(route.destination_city)
+        })
+        setUniqueCities({
+          origins: Array.from(origins).sort(),
+          destinations: Array.from(destinations).sort()
+        })
+      } catch (err) {
+        console.error('Failed to load routes', err)
+      }
+    }
+    loadRoutes()
+    return () => { mounted = false }
+  }, [])
 
   const handleChange = (e) => {
     const { name, value } = e.target
     setForm(prev => ({ ...prev, [name]: value }))
   }
 
-  useEffect(() => {
-    let mounted = true
-    const load = async () => {
-      try {
-        const res = await api.get('/buses/')
-        if (!mounted) return
-        setBuses(res.data)
-      } catch (err) {
-        console.error('Failed to load buses', err)
-      }
+  // Step 1: Handle route selection and load buses
+  const handleRouteSelection = async () => {
+    if (!form.start_location || !form.drop_location) {
+      alert('Please select both origin and destination')
+      return
     }
-    load()
-    return () => { mounted = false }
-  }, [])
 
-  // When bus is selected, populate locations from route
+    if (form.start_location === form.drop_location) {
+      alert('Origin and destination cannot be the same')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const res = await api.get('/buses/', {
+        params: {
+          origin_city: form.start_location,
+          destination_city: form.drop_location
+        }
+      })
+      setBuses(res.data)
+      
+      if (res.data.length === 0) {
+        alert('No buses available for this route')
+        setLoading(false)
+        return
+      }
+      
+      setStep(2)
+    } catch (err) {
+      console.error('Failed to load buses', err)
+      alert('Failed to load buses. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // When bus is selected, show route info and get price from DB
   useEffect(() => {
     if (form.bus) {
       const bus = buses.find(b => b.id === Number(form.bus))
-      if (bus && bus.route) {
+      if (bus) {
         setSelectedBus(bus)
-        setForm(prev => ({
-          ...prev,
-          start_location: bus.route.origin_city || prev.start_location,
-          drop_location: bus.route.destination_city || prev.drop_location
-        }))
+        // Update price based on selected bus price from database
+        const pricePerSeat = bus.price || 500 // Fallback to 500 if price not set
+        setBookingPrice(Number(form.seats) * pricePerSeat)
       }
     }
-  }, [form.bus, buses])
+  }, [form.bus, buses, form.seats])
 
-  // Calculate price (dummy: 500 per seat)
+  // Calculate price when seats change (using selected bus price)
   useEffect(() => {
-    setBookingPrice(Number(form.seats) * 500)
-  }, [form.seats])
+    if (selectedBus && form.bus) {
+      const pricePerSeat = selectedBus.price || 500
+      setBookingPrice(Number(form.seats) * pricePerSeat)
+    }
+  }, [form.seats, selectedBus, form.bus])
 
   const handlePayment = async () => {
-    if (!form.bus || !form.start_location || !form.drop_location || !form.travel_date) {
+    if (!form.bus || !form.travel_date) {
       alert('Please fill in all required fields')
       return
     }
 
-    // client-side travel date validation: must be a future date
     const selected = new Date(form.travel_date)
     const today = new Date()
-    today.setHours(0,0,0,0)
+    today.setHours(0, 0, 0, 0)
     if (selected <= today) {
       alert('Please select a future travel date')
       return
@@ -71,7 +125,6 @@ const Booking = () => {
 
     setLoading(true)
     try {
-      // Step 1: Create booking (initially)
       const bookingRes = await api.post('/book/', {
         bus: form.bus,
         seats_booked: Number(form.seats),
@@ -81,14 +134,13 @@ const Booking = () => {
       })
       const bookingId = bookingRes.data.id
 
-      // Step 2: Create Razorpay order
       const orderRes = await api.post('/payments/create-order/', {
         booking_id: bookingId,
         amount: bookingPrice,
         currency: 'INR',
       })
       const { razorpay_order_id } = orderRes.data
-      // Step 3: Initiate Razorpay payment
+      
       await initiatePayment({
         orderId: razorpay_order_id,
         amount: bookingPrice,
@@ -97,7 +149,6 @@ const Booking = () => {
         onSuccess: async (paymentResponse) => {
           console.log('Payment successful:', paymentResponse)
           try {
-            // Step 4: Verify payment on backend
             await api.post('/payments/verify/', {
               razorpay_payment_id: paymentResponse.paymentId,
               razorpay_order_id: paymentResponse.orderId,
@@ -105,6 +156,8 @@ const Booking = () => {
             })
             alert('Booking confirmed! Payment received.')
             setForm({ bus: '', seats: 1, notes: '', start_location: '', drop_location: '', travel_date: '' })
+            setStep(1)
+            setBuses([])
             navigate('/mybooking')
           } catch (err) {
             console.error('Booking save failed', err)
@@ -129,116 +182,170 @@ const Booking = () => {
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h2 className="text-3xl font-bold mb-6 text-gray-800">Book Your Bus Ticket</h2>
 
-            <form onSubmit={(e) => { e.preventDefault(); handlePayment() }} className="space-y-4">
-              <div className="flex flex-col">
-                <label htmlFor="bus" className="text-sm font-semibold text-gray-700 mb-2">Select Bus *</label>
-                <select
-                  id="bus"
-                  name="bus"
-                  value={form.bus}
-                  onChange={handleChange}
-                  required
-                  className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
-                >
-                  <option value="">Choose a bus</option>
-                  {buses.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {`${b.name} (${b.owner}) — ${b.seats} seats available`}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Auto-populated locations from route */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col">
-                  <label htmlFor="start_location" className="text-sm font-semibold text-gray-700 mb-2">From *</label>
-                  <input 
-                    id="start_location" 
-                    name="start_location" 
-                    value={form.start_location} 
-                    onChange={handleChange} 
-                    type="text" 
-                    placeholder="Departure city" 
-                    required 
-                    className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition" 
-                  />
+            {/* Step 1: Route Selection */}
+            {step === 1 && (
+              <form onSubmit={(e) => { e.preventDefault(); handleRouteSelection() }} className="space-y-4">
+                <div className="mb-6">
+                  <div className="flex items-center justify-center">
+                    <div className="flex items-center justify-center w-10 h-10 bg-red-600 text-white rounded-full font-bold">1</div>
+                    <div className="flex-1 h-1 bg-red-600 mx-2"></div>
+                    <div className="flex items-center justify-center w-10 h-10 bg-gray-300 text-gray-600 rounded-full font-bold">2</div>
+                  </div>
+                  <p className="text-center text-sm text-gray-600 mt-2">Select Your Route</p>
                 </div>
-                <div className="flex flex-col">
-                  <label htmlFor="drop_location" className="text-sm font-semibold text-gray-700 mb-2">To *</label>
-                  <input 
-                    id="drop_location" 
-                    name="drop_location" 
-                    value={form.drop_location} 
-                    onChange={handleChange} 
-                    type="text" 
-                    placeholder="Destination city" 
-                    required 
-                    className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition" 
-                  />
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col">
-                  <label htmlFor="seats" className="text-sm font-semibold text-gray-700 mb-2">Number of Seats *</label>
-                  <input
-                    id="seats"
-                    name="seats"
-                    type="number"
-                    min="1"
-                    value={form.seats}
+                  <label htmlFor="start_location" className="text-sm font-semibold text-gray-700 mb-2">From (Origin) *</label>
+                  <select
+                    id="start_location"
+                    name="start_location"
+                    value={form.start_location}
                     onChange={handleChange}
                     required
+                    className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
+                  >
+                    <option value="">Select Origin City</option>
+                    {uniqueCities.origins.map((city) => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col">
+                  <label htmlFor="drop_location" className="text-sm font-semibold text-gray-700 mb-2">To (Destination) *</label>
+                  <select
+                    id="drop_location"
+                    name="drop_location"
+                    value={form.drop_location}
+                    onChange={handleChange}
+                    required
+                    className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
+                  >
+                    <option value="">Select Destination City</option>
+                    {uniqueCities.destinations.map((city) => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-4">
+                  <button 
+                    type="submit" 
+                    disabled={loading}
+                    className="px-8 py-3 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 disabled:opacity-50 transition"
+                  >
+                    {loading ? '⏳ Loading Buses...' : 'Search Buses →'}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Step 2: Bus & Details Selection */}
+            {step === 2 && (
+              <form onSubmit={(e) => { e.preventDefault(); handlePayment() }} className="space-y-4">
+                <div className="mb-6">
+                  <div className="flex items-center justify-center">
+                    <div className="flex items-center justify-center w-10 h-10 bg-green-600 text-white rounded-full font-bold">✓</div>
+                    <div className="flex-1 h-1 bg-green-600 mx-2"></div>
+                    <div className="flex items-center justify-center w-10 h-10 bg-red-600 text-white rounded-full font-bold">2</div>
+                  </div>
+                  <p className="text-center text-sm text-gray-600 mt-2">Select Bus & Complete Details</p>
+                </div>
+
+                {/* Route Summary */}
+                <div className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-600 mb-4">
+                  <p className="text-sm text-gray-700">
+                    <span className="font-bold">{form.start_location}</span> → <span className="font-bold">{form.drop_location}</span>
+                    <button 
+                      type="button"
+                      onClick={() => { setStep(1); setBuses([]); setForm(prev => ({ ...prev, bus: '' })); }}
+                      className="ml-4 text-blue-600 hover:text-blue-800 font-semibold text-xs"
+                    >
+                      Change Route
+                    </button>
+                  </p>
+                </div>
+
+                <div className="flex flex-col">
+                  <label htmlFor="bus" className="text-sm font-semibold text-gray-700 mb-2">Select Bus *</label>
+                  <select
+                    id="bus"
+                    name="bus"
+                    value={form.bus}
+                    onChange={handleChange}
+                    required
+                    className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
+                  >
+                    <option value="">Choose a bus</option>
+                    {buses.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {`${b.name} (${b.owner}) — ${b.seats} seats available`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col">
+                    <label htmlFor="seats" className="text-sm font-semibold text-gray-700 mb-2">Number of Seats *</label>
+                    <input
+                      id="seats"
+                      name="seats"
+                      type="number"
+                      min="1"
+                      value={form.seats}
+                      onChange={handleChange}
+                      required
+                      className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label htmlFor="travel_date" className="text-sm font-semibold text-gray-700 mb-2">Travel Date *</label>
+                    <input
+                      id="travel_date"
+                      name="travel_date"
+                      type="date"
+                      value={form.travel_date}
+                      onChange={handleChange}
+                      required
+                      min={(() => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split('T')[0]; })()}
+                      className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col">
+                  <label htmlFor="notes" className="text-sm font-semibold text-gray-700 mb-2">Special Requests (optional)</label>
+                  <textarea
+                    id="notes"
+                    name="notes"
+                    value={form.notes}
+                    onChange={handleChange}
+                    rows="3"
+                    placeholder="Any special requirements?"
                     className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
                   />
                 </div>
 
-                <div className="flex flex-col">
-                  <label htmlFor="travel_date" className="text-sm font-semibold text-gray-700 mb-2">Travel Date *</label>
-                  <input
-                    id="travel_date"
-                    name="travel_date"
-                    type="date"
-                    value={form.travel_date}
-                    onChange={handleChange}
-                    required
-                    min={(() => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split('T')[0]; })()}
-                    className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
-                  />
+                <div className="flex items-center justify-end gap-3 pt-4">
+                  <button 
+                    type="button" 
+                    className="px-6 py-2 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition" 
+                    onClick={() => { setStep(1); setBuses([]); setForm(prev => ({ ...prev, bus: '' })); }}
+                  >
+                    ← Back
+                  </button>
+                  <button 
+                    disabled={loading} 
+                    type="submit" 
+                    className="px-8 py-3 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 disabled:opacity-50 transition"
+                  >
+                    {loading ? '⏳ Processing...' : `Pay & Book (₹${bookingPrice})`}
+                  </button>
                 </div>
-              </div>
-
-              <div className="flex flex-col">
-                <label htmlFor="notes" className="text-sm font-semibold text-gray-700 mb-2">Special Requests (optional)</label>
-                <textarea
-                  id="notes"
-                  name="notes"
-                  value={form.notes}
-                  onChange={handleChange}
-                  rows="3"
-                  placeholder="Any special requirements?"
-                  className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-4">
-                <button 
-                  type="button" 
-                  className="px-6 py-2 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition" 
-                  onClick={() => setForm({ bus: '', seats: 1, notes: '', start_location: '', drop_location: '', travel_date: '' })}
-                >
-                  Clear
-                </button>
-                <button 
-                  disabled={loading} 
-                  type="submit" 
-                  className="px-8 py-3 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 disabled:opacity-50 transition"
-                >
-                  {loading ? '⏳ Processing...' : `Pay & Book (₹${bookingPrice})`}
-                </button>
-              </div>
-            </form>
+              </form>
+            )}
           </div>
         </div>
 
@@ -265,14 +372,14 @@ const Booking = () => {
           </div>
 
           {/* Route Info */}
-          {selectedBus && selectedBus.route && (
+          {selectedBus && (
             <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-red-600">
               <h3 className="text-lg font-bold text-gray-800 mb-4">Route Information</h3>
               <div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-600">Departure</p>
-                  <p className="font-bold text-gray-800">{selectedBus.route.origin_city}</p>
-                  {selectedBus.route.origin_latitude && (
+                  <p className="font-bold text-gray-800">{selectedBus.route?.origin_city || 'N/A'}</p>
+                  {selectedBus.route?.origin_latitude && (
                     <p className="text-xs text-gray-500">
                       📍 {selectedBus.route.origin_latitude.toFixed(2)}, {selectedBus.route.origin_longitude.toFixed(2)}
                     </p>
@@ -283,8 +390,8 @@ const Booking = () => {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Arrival</p>
-                  <p className="font-bold text-gray-800">{selectedBus.route.destination_city}</p>
-                  {selectedBus.route.destination_latitude && (
+                  <p className="font-bold text-gray-800">{selectedBus.route?.destination_city || 'N/A'}</p>
+                  {selectedBus.route?.destination_latitude && (
                     <p className="text-xs text-gray-500">
                       📍 {selectedBus.route.destination_latitude.toFixed(2)}, {selectedBus.route.destination_longitude.toFixed(2)}
                     </p>
@@ -295,7 +402,7 @@ const Booking = () => {
           )}
 
           {/* Features */}
-          <div className="bg-blue-50 rounded-lg p-6 border-l-4 border-blue-600">
+          <div className="bg-blue-50 rounded-lg p-6 border-l-4 border-red-600">
             <h3 className="font-bold text-gray-800 mb-3">Why Book with Us?</h3>
             <ul className="space-y-2 text-sm text-gray-700">
               <li>✓ Best prices guaranteed</li>

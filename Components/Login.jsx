@@ -13,7 +13,7 @@ const Login = () => {
       >
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-gray-800 mb-1">Welcome back</h2>
-          <p className="text-sm text-gray-500">Sign in to continue to BusBook</p>
+          <p className="text-sm text-gray-500">Sign in to continue to PickBus</p>
         </div>
 
         <div className="flex flex-col space-y-1">
@@ -21,7 +21,7 @@ const Login = () => {
           <input
             onChange={(e) => handleUserLogin(e)}
             value={userLogin?.username ?? ''}
-            className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-300"
+            className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
             type="text"
             id="username"
             name="username"
@@ -34,7 +34,7 @@ const Login = () => {
           <input
             onChange={(e) => handleUserLogin(e)}
             value={userLogin?.password ?? ''}
-            className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-300"
+            className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
             type="password"
             id="password"
             name="password"

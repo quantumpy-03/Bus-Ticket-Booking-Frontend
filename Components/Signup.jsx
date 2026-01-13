@@ -13,7 +13,7 @@ const Signup = () => {
       >
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-gray-800 mb-1">Create your account</h2>
-          <p className="text-sm text-gray-500">Join BusBook — quick, safe booking in seconds.</p>
+          <p className="text-sm text-gray-500">Join PickBus — quick, safe booking in seconds.</p>
         </div>
 
         <div className="flex flex-col space-y-1">
@@ -21,7 +21,7 @@ const Signup = () => {
           <input
             onChange={(e) => handleNewUser(e)}
             value={newUser?.username ?? ''}
-            className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-300"
+            className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
             type="text"
             id="username"
             name="username"
@@ -34,7 +34,7 @@ const Signup = () => {
           <input
             onChange={(e) => handleNewUser(e)}
             value={newUser?.phone_number ?? ''}
-            className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-300"
+            className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
             type="text"
             id="phone_number"
             name="phone_number"
@@ -47,7 +47,7 @@ const Signup = () => {
           <input
             onChange={(e) => handleNewUser(e)}
             value={newUser?.email ?? ''}
-            className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-300"
+            className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
             type="email"
             id="email"
             name="email"
@@ -60,7 +60,7 @@ const Signup = () => {
           <input
             onChange={(e) => handleNewUser(e)}
             value={newUser?.password ?? ''}
-            className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-300"
+            className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
             type="password"
             id="password"
             name="password"

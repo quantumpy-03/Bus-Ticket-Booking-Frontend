@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import { NavLink } from 'react-router-dom'
 import DataContext from '../Context/DataContext'
-
+import { FaBus } from 'react-icons/fa'
 
 const NavItem = ({ to, children }) => (
   <NavLink
@@ -21,7 +21,7 @@ const Navbar = () => {
     <header className="bg-red-600 shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
         <NavLink to="/" className="text-white text-2xl font-bold hover:text-red-100 transition">
-          ✈️ BusBook
+          <FaBus className="inline mr-2" /> PickBus
         </NavLink>
 
         <nav className="flex items-center gap-1">
