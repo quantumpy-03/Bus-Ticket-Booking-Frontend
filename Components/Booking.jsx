@@ -100,7 +100,7 @@ const Booking = () => {
 
   // Calculate price (500 per seat)
   useEffect(() => {
-    setBookingPrice(Number(form.seats) * 500)
+    setBookingPrice(Number(form.seats) * Number(selectedBus?.price || 500))
   }, [form.seats])
 
   const handlePayment = async () => {
