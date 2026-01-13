@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import DataContext from '../Context/DataContext'
+import { FaBolt, FaLock, FaCheck } from 'react-icons/fa'
 
 const Home = () => {
   const { isAuthenticated } = useContext(DataContext)
@@ -27,23 +28,23 @@ const Home = () => {
         <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
           {[
             { 
-              icon: '⚡', 
+              icon: <FaBolt />, 
               title: 'Lightning Fast', 
               description: 'Book your tickets in seconds with our streamlined booking process' 
             },
             { 
-              icon: '🔒', 
+              icon: <FaLock />, 
               title: 'Secure Payments', 
               description: 'Industry-leading encryption keeps your payment information safe' 
             },
             { 
-              icon: '✓', 
+              icon: <FaCheck />, 
               title: 'Best Prices', 
               description: 'Compare and get the best deals on bus tickets across operators' 
             },
           ].map((feature, i) => (
             <div key={i} className='bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition border-l-4 border-red-600'>
-              <div className='text-4xl mb-3'>{feature.icon}</div>
+              <div className='text-4xl mb-3 text-red-600'>{feature.icon}</div>
               <h3 className='text-2xl font-bold mb-2 text-gray-800'>{feature.title}</h3>
               <p className='text-gray-600'>{feature.description}</p>
             </div>

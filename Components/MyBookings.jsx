@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import api from '../api/api'
+import { FaHourglass } from 'react-icons/fa'
 
 const MyBookings = () => {
   const [bookings, setBookings] = useState([])
@@ -213,7 +214,7 @@ const MyBookings = () => {
               >
                 {cancelling ? (
                   <>
-                    <span className="inline-block animate-spin mr-2">⏳</span>
+                    <FaHourglass className="animate-spin mr-2" />
                     Processing...
                   </>
                 ) : (

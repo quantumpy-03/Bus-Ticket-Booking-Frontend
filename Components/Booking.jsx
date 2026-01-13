@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { initiatePayment } from '../utils/payment'
 import { useContext } from 'react'
 import { DataContext } from '../Context/DataContext'
+import { FaHourglass, FaCheck, FaArrowRight, FaArrowDown, FaArrowLeft, FaMapMarkerAlt } from 'react-icons/fa'
 
 const Booking = () => {
   const [form, setForm] = useState({ bus: '', seats: 1, notes: '', start_location: '', drop_location: '', travel_date: '' })
@@ -227,9 +228,9 @@ const Booking = () => {
                   <button 
                     type="submit" 
                     disabled={loading}
-                    className="px-8 py-3 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 disabled:opacity-50 transition"
+                    className="px-8 py-3 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 disabled:opacity-50 transition flex items-center justify-center gap-2"
                   >
-                    {loading ? '⏳ Loading Buses...' : 'Search Buses →'}
+                    {loading ? <><FaHourglass className="animate-spin" /> Loading Buses...</> : <><span>Search Buses</span> <FaArrowRight /></>}
                   </button>
                 </div>
               </form>
@@ -240,7 +241,7 @@ const Booking = () => {
               <form onSubmit={(e) => { e.preventDefault(); handlePayment() }} className="space-y-4">
                 <div className="mb-6">
                   <div className="flex items-center justify-center">
-                    <div className="flex items-center justify-center w-10 h-10 bg-green-600 text-white rounded-full font-bold">✓</div>
+                    <div className="flex items-center justify-center w-10 h-10 bg-green-600 text-white rounded-full font-bold"><FaCheck /></div>
                     <div className="flex-1 h-1 bg-green-600 mx-2"></div>
                     <div className="flex items-center justify-center w-10 h-10 bg-red-600 text-white rounded-full font-bold">2</div>
                   </div>
@@ -249,8 +250,8 @@ const Booking = () => {
 
                 {/* Route Summary */}
                 <div className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-600 mb-4">
-                  <p className="text-sm text-gray-700">
-                    <span className="font-bold">{form.start_location}</span> → <span className="font-bold">{form.drop_location}</span>
+                  <p className="text-sm text-gray-700 flex items-center gap-2">
+                    <span className="font-bold">{form.start_location}</span> <FaArrowRight /> <span className="font-bold">{form.drop_location}</span>
                     <button 
                       type="button"
                       onClick={() => { setStep(1); setBuses([]); setForm(prev => ({ ...prev, bus: '' })); }}
@@ -326,17 +327,17 @@ const Booking = () => {
                 <div className="flex items-center justify-end gap-3 pt-4">
                   <button 
                     type="button" 
-                    className="px-6 py-2 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition" 
+                    className="px-6 py-2 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition flex items-center justify-center gap-2" 
                     onClick={() => { setStep(1); setBuses([]); setForm(prev => ({ ...prev, bus: '' })); }}
                   >
-                    ← Back
+                    <FaArrowLeft /> Back
                   </button>
                   <button 
                     disabled={loading} 
                     type="submit" 
-                    className="px-8 py-3 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 disabled:opacity-50 transition"
+                    className="px-8 py-3 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 disabled:opacity-50 transition flex items-center justify-center gap-2"
                   >
-                    {loading ? '⏳ Processing...' : `Pay & Book (₹${bookingPrice})`}
+                    {loading ? <><FaHourglass className="animate-spin" /> Processing...</> : `Pay & Book (₹${bookingPrice})`}
                   </button>
                 </div>
               </form>
@@ -378,20 +379,20 @@ const Booking = () => {
                   <p className="text-sm text-gray-600">Departure</p>
                   <p className="font-bold text-gray-800">{selectedBus.route?.origin_city || 'N/A'}</p>
                   {selectedBus.route?.origin_latitude && (
-                    <p className="text-xs text-gray-500">
-                      📍 {selectedBus.route.origin_latitude.toFixed(2)}, {selectedBus.route.origin_longitude.toFixed(2)}
+                    <p className="text-xs text-gray-500 flex items-center gap-1">
+                      <FaMapMarkerAlt /> {selectedBus.route.origin_latitude.toFixed(2)}, {selectedBus.route.origin_longitude.toFixed(2)}
                     </p>
                   )}
                 </div>
                 <div className="border-t-2 border-dashed border-gray-300 py-2 text-center">
-                  <p className="text-gray-600">↓</p>
+                  <p className="text-gray-600"><FaArrowDown /></p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Arrival</p>
                   <p className="font-bold text-gray-800">{selectedBus.route?.destination_city || 'N/A'}</p>
                   {selectedBus.route?.destination_latitude && (
-                    <p className="text-xs text-gray-500">
-                      📍 {selectedBus.route.destination_latitude.toFixed(2)}, {selectedBus.route.destination_longitude.toFixed(2)}
+                    <p className="text-xs text-gray-500 flex items-center gap-1">
+                      <FaMapMarkerAlt /> {selectedBus.route.destination_latitude.toFixed(2)}, {selectedBus.route.destination_longitude.toFixed(2)}
                     </p>
                   )}
                 </div>
@@ -403,10 +404,10 @@ const Booking = () => {
           <div className="bg-blue-50 rounded-lg p-6 border-l-4 border-red-600">
             <h3 className="font-bold text-gray-800 mb-3">Why Book with Us?</h3>
             <ul className="space-y-2 text-sm text-gray-700">
-              <li>✓ Best prices guaranteed</li>
-              <li>✓ Secure payment</li>
-              <li>✓ Easy cancellation</li>
-              <li>✓ 24/7 support</li>
+              <li className="flex items-center gap-2"><FaCheck className="text-green-600" /> Best prices guaranteed</li>
+              <li className="flex items-center gap-2"><FaCheck className="text-green-600" /> Secure payment</li>
+              <li className="flex items-center gap-2"><FaCheck className="text-green-600" /> Easy cancellation</li>
+              <li className="flex items-center gap-2"><FaCheck className="text-green-600" /> 24/7 support</li>
             </ul>
           </div>
         </div>
