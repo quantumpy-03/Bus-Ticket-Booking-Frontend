@@ -88,26 +88,20 @@ const Booking = () => {
     }
   }
 
-  // When bus is selected, show route info and get price from DB
+  // When bus is selected, show route info
   useEffect(() => {
     if (form.bus) {
       const bus = buses.find(b => b.id === Number(form.bus))
-      if (bus) {
+      if (bus && bus.route) {
         setSelectedBus(bus)
-        // Update price based on selected bus price from database
-        const pricePerSeat = bus.price || 500 // Fallback to 500 if price not set
-        setBookingPrice(Number(form.seats) * pricePerSeat)
       }
     }
-  }, [form.bus, buses, form.seats])
+  }, [form.bus, buses])
 
-  // Calculate price when seats change (using selected bus price)
+  // Calculate price (500 per seat)
   useEffect(() => {
-    if (selectedBus && form.bus) {
-      const pricePerSeat = selectedBus.price || 500
-      setBookingPrice(Number(form.seats) * pricePerSeat)
-    }
-  }, [form.seats, selectedBus, form.bus])
+    setBookingPrice(Number(form.seats) * 500)
+  }, [form.seats])
 
   const handlePayment = async () => {
     if (!form.bus || !form.travel_date) {
@@ -352,12 +346,15 @@ const Booking = () => {
         {/* Price Summary & Route Info */}
         <div className="space-y-4">
           {/* Price Card */}
+          
+          {selectedBus && (
+            
           <div className="bg-linear-to-br from-red-600 to-red-500 text-white rounded-lg shadow-lg p-6">
             <h3 className="text-xl font-bold mb-4">Price Breakdown</h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-red-50">Price per seat:</span>
-                <span className="font-bold text-lg">₹500</span>
+                <span className="font-bold text-lg">{selectedBus.price || 500}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-red-50">Number of seats:</span>
@@ -370,7 +367,7 @@ const Booking = () => {
             </div>
             <p className="text-red-100 text-xs mt-4">Taxes & charges included</p>
           </div>
-
+          )}
           {/* Route Info */}
           {selectedBus && (
             <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-red-600">
