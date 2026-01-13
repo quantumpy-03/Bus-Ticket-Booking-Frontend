@@ -94,6 +94,7 @@ const Booking = () => {
       const bus = buses.find(b => b.id === Number(form.bus))
       if (bus && bus.route) {
         setSelectedBus(bus)
+        setBookingPrice(bus.price)
       }
     }
   }, [form.bus, buses])
