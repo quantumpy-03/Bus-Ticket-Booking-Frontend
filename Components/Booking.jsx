@@ -1,15 +1,14 @@
-// filepath: c:\Users\KAMAL TAMIL\Documents\booking-task\frontend\Components\Booking.jsx
 import React, { useState, useEffect } from 'react'
 import api from '../api/api'
 import { useNavigate } from 'react-router-dom'
 import { initiatePayment } from '../utils/payment'
 import { useContext } from 'react'
-import { DataContext } from '../Context/DataContext'
+import DataContext from '../Context/DataContext'
 import { FaHourglass, FaCheck, FaArrowRight, FaArrowDown, FaArrowLeft, FaMapMarkerAlt } from 'react-icons/fa'
+import Button from './Button'
 
 const Booking = () => {
   const [form, setForm] = useState({ bus: '', seats: 1, notes: '', start_location: '', drop_location: '', travel_date: '' })
-  const [routes, setRoutes] = useState([])
   const [buses, setBuses] = useState([])
   const [selectedBus, setSelectedBus] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -26,8 +25,6 @@ const Booking = () => {
       try {
         const res = await api.get('/routes/')
         if (!mounted) return
-        setRoutes(res.data)
-        
         // Extract unique origin and destination cities
         const origins = new Set()
         const destinations = new Set()
@@ -103,7 +100,7 @@ const Booking = () => {
   // Calculate price (500 per seat)
   useEffect(() => {
     setBookingPrice(Number(form.seats) * Number(selectedBus?.price || 500))
-  }, [form.seats])
+  }, [form.seats, selectedBus])
 
   const handlePayment = async () => {
     if (!form.bus || !form.travel_date) {
@@ -171,7 +168,7 @@ const Booking = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto mt-6 p-4">
+    <div className="max-w-5xl mx-auto mt-6 p-2 sm:p-4 lg:p-8">
       <div className="grid md:grid-cols-3 gap-6">
         {/* Booking Form */}
         <div className="md:col-span-2">
@@ -183,8 +180,8 @@ const Booking = () => {
               <form onSubmit={(e) => { e.preventDefault(); handleRouteSelection() }} className="space-y-4">
                 <div className="mb-6">
                   <div className="flex items-center justify-center">
-                    <div className="flex items-center justify-center w-10 h-10 bg-red-600 text-white rounded-full font-bold">1</div>
-                    <div className="flex-1 h-1 bg-red-600 mx-2"></div>
+                    <div className="flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-full font-bold">1</div>
+                    <div className="flex-1 h-1 bg-blue-600 mx-2"></div>
                     <div className="flex items-center justify-center w-10 h-10 bg-gray-300 text-gray-600 rounded-full font-bold">2</div>
                   </div>
                   <p className="text-center text-sm text-gray-600 mt-2">Select Your Route</p>
@@ -198,7 +195,7 @@ const Booking = () => {
                     value={form.start_location}
                     onChange={handleChange}
                     required
-                    className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
+                    className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition"
                   >
                     <option value="">Select Origin City</option>
                     {uniqueCities.origins.map((city) => (
@@ -215,7 +212,7 @@ const Booking = () => {
                     value={form.drop_location}
                     onChange={handleChange}
                     required
-                    className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
+                    className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition"
                   >
                     <option value="">Select Destination City</option>
                     {uniqueCities.destinations.map((city) => (
@@ -224,14 +221,14 @@ const Booking = () => {
                   </select>
                 </div>
 
-                <div className="flex items-center justify-end gap-3 pt-4">
-                  <button 
+                <div className="flex items-center justify-center gap-3 pt-4">
+                  <Button 
                     type="submit" 
                     disabled={loading}
-                    className="px-8 py-3 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 disabled:opacity-50 transition flex items-center justify-center gap-2"
+                    className="px-8 py-3 rounded-lg flex items-center justify-center gap-2"
                   >
                     {loading ? <><FaHourglass className="animate-spin" /> Loading Buses...</> : <><span>Search Buses</span> <FaArrowRight /></>}
-                  </button>
+                  </Button>
                 </div>
               </form>
             )}
@@ -243,7 +240,7 @@ const Booking = () => {
                   <div className="flex items-center justify-center">
                     <div className="flex items-center justify-center w-10 h-10 bg-green-600 text-white rounded-full font-bold"><FaCheck /></div>
                     <div className="flex-1 h-1 bg-green-600 mx-2"></div>
-                    <div className="flex items-center justify-center w-10 h-10 bg-red-600 text-white rounded-full font-bold">2</div>
+                    <div className="flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-full font-bold">2</div>
                   </div>
                   <p className="text-center text-sm text-gray-600 mt-2">Select Bus & Complete Details</p>
                 </div>
@@ -270,7 +267,7 @@ const Booking = () => {
                     value={form.bus}
                     onChange={handleChange}
                     required
-                    className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
+                    className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition"
                   >
                     <option value="">Choose a bus</option>
                     {buses.map((b) => (
@@ -292,7 +289,7 @@ const Booking = () => {
                       value={form.seats}
                       onChange={handleChange}
                       required
-                      className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
+                      className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition"
                     />
                   </div>
 
@@ -306,7 +303,7 @@ const Booking = () => {
                       onChange={handleChange}
                       required
                       min={(() => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split('T')[0]; })()}
-                      className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
+                      className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition"
                     />
                   </div>
                 </div>
@@ -320,25 +317,26 @@ const Booking = () => {
                     onChange={handleChange}
                     rows="3"
                     placeholder="Any special requirements?"
-                    className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
+                    className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition"
                   />
                 </div>
 
-                <div className="flex items-center justify-end gap-3 pt-4">
-                  <button 
+                <div className="flex items-center justify-between gap-3 pt-4">
+                  <Button 
                     type="button" 
-                    className="px-6 py-2 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition flex items-center justify-center gap-2" 
+                    variant="outline"
+                    className="px-6 py-2 rounded-lg flex items-center justify-center gap-2" 
                     onClick={() => { setStep(1); setBuses([]); setForm(prev => ({ ...prev, bus: '' })); }}
                   >
                     <FaArrowLeft /> Back
-                  </button>
-                  <button 
+                  </Button>
+                  <Button 
                     disabled={loading} 
                     type="submit" 
-                    className="px-8 py-3 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 disabled:opacity-50 transition flex items-center justify-center gap-2"
+                    className="px-8 py-3 rounded-lg flex items-center justify-center gap-2"
                   >
                     {loading ? <><FaHourglass className="animate-spin" /> Processing...</> : `Pay & Book (₹${bookingPrice})`}
-                  </button>
+                  </Button>
                 </div>
               </form>
             )}
@@ -347,32 +345,9 @@ const Booking = () => {
 
         {/* Price Summary & Route Info */}
         <div className="space-y-4">
-          {/* Price Card */}
-          
+           {/* Route Info */}
           {selectedBus && (
-            
-          <div className="bg-linear-to-br from-red-600 to-red-500 text-white rounded-lg shadow-lg p-6">
-            <h3 className="text-xl font-bold mb-4">Price Breakdown</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-red-50">Price per seat:</span>
-                <span className="font-bold text-lg">{selectedBus.price || 500}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-red-50">Number of seats:</span>
-                <span className="font-bold text-lg">{form.seats}</span>
-              </div>
-              <div className="border-t border-red-400 pt-3 flex justify-between items-center">
-                <span className="font-bold">Total Fare:</span>
-                <span className="text-3xl font-bold">₹{bookingPrice}</span>
-              </div>
-            </div>
-            <p className="text-red-100 text-xs mt-4">Taxes & charges included</p>
-          </div>
-          )}
-          {/* Route Info */}
-          {selectedBus && (
-            <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-red-600">
+            <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-blue-600">
               <h3 className="text-lg font-bold text-gray-800 mb-4">Route Information</h3>
               <div className="space-y-4">
                 <div>
@@ -400,8 +375,32 @@ const Booking = () => {
             </div>
           )}
 
+          {/* Price Card */}
+          
+          {selectedBus && (
+            
+          <div className="bg-linear-to-br from-blue-600 to-blue-500 text-white rounded-lg shadow-lg p-6">
+            <h3 className="text-xl font-bold mb-4">Price Breakdown</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-blue-50">Price per seat:</span>
+                <span className="font-bold text-lg">{selectedBus.price || 500}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-blue-50">Number of seats:</span>
+                <span className="font-bold text-lg">{form.seats}</span>
+              </div>
+              <div className="border-t border-blue-400 pt-3 flex justify-between items-center">
+                <span className="font-bold">Total Fare:</span>
+                <span className="text-3xl font-bold">₹{bookingPrice}</span>
+              </div>
+            </div>
+            <p className="text-blue-100 text-xs mt-4">Taxes & charges included</p>
+          </div>
+          )}
+         
           {/* Features */}
-          <div className="bg-blue-50 rounded-lg p-6 border-l-4 border-red-600">
+          <div className="bg-blue-50 rounded-lg p-6 border-l-4 border-blue-600">
             <h3 className="font-bold text-gray-800 mb-3">Why Book with Us?</h3>
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex items-center gap-2"><FaCheck className="text-green-600" /> Best prices guaranteed</li>

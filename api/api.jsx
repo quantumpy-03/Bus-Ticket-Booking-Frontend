@@ -1,37 +1,39 @@
 import axios from "axios";
-import * as jwtDecodeModule from "jwt-decode";
-
-function jwtDecodeSafe(token) {
-    const candidate = jwtDecodeModule && (jwtDecodeModule.default ?? jwtDecodeModule);
-    if (typeof candidate === "function") return candidate(token);
-    if (jwtDecodeModule && typeof jwtDecodeModule.jwtDecode === "function") return jwtDecodeModule.jwtDecode(token);
-    throw new TypeError("jwt-decode import is not callable. Use an ESM-compatible import or 'jwt-decode/dist/jwt-decode.esm.js'");
-}
+import { jwtDecode } from "jwt-decode";
+import { getAccessToken, getRefreshToken, setTokens, removeTokens } from "../utils/tokenManager";
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
 api.interceptors.request.use(async (config) => {
-    let accessToken = localStorage.getItem("access_token");
+    // Exclude the token refresh endpoint from the interceptor to prevent recursion
+    if (config.url.includes("/auth/token/refresh/")) {
+        return config;
+    }
+
+    let accessToken = getAccessToken();
 
     if (accessToken) {
-        const decoded = jwtDecodeSafe(accessToken);
+        const decoded = jwtDecode(accessToken);
         const isExpired = decoded.exp * 1000 < Date.now();
 
         if (isExpired) {
             try {
-                const refresh = localStorage.getItem("refresh_token");
+                const refresh = getRefreshToken();
+                if (!refresh) {
+                    throw new Error("No refresh token available.");
+                }
 
-                const response = await api.post(
-                    "/auth/token/refresh/",
+                const response = await axios.post(
+                    `${import.meta.env.VITE_API_BASE_URL}/auth/token/refresh/`,
                     { refresh }
                 );
 
                 accessToken = response.data.access;
-                localStorage.setItem("access_token", accessToken);
+                setTokens(accessToken, null); // Only access token is refreshed
             } catch (error) {
-                localStorage.clear();
+                removeTokens();
                 window.location.href = "/login";
                 return Promise.reject(error);
             }

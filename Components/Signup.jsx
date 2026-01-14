@@ -1,15 +1,36 @@
-import { useContext, useState } from 'react'
+import { useContext, useState, useEffect } from 'react';
 import DataContext from '../Context/DataContext';
+import { useNavigate } from 'react-router-dom';
+import Button from './Button';
 
 const Signup = () => {
-  const { handleNewUser, handleAddNewUser, newUser } = useContext(DataContext);
+  const { handleNewUser, handleAddNewUser, newUser, isAuthenticated } = useContext(DataContext);
   const [loading, setLoading] = useState(false)
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+        await handleAddNewUser(e); 
+    } catch (error) {
+        console.error("Signup failed:", error)
+    } finally {
+        setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-[72vh] flex items-center justify-center px-4 py-8">
       <form
-        onSubmit={async (e) => { setLoading(true); await handleAddNewUser(e); setLoading(false); }}
-        className="w-full max-w-lg mx-auto bg-white shadow-xl rounded-xl p-8 space-y-6 border-t-4 border-red-600"
+        onSubmit={handleSubmit}
+        className="w-full max-w-lg mx-auto bg-white shadow-xl rounded-xl p-8 space-y-6 border-t-4 border-blue-600"
       >
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-gray-800 mb-1">Create your account</h2>
@@ -21,10 +42,11 @@ const Signup = () => {
           <input
             onChange={(e) => handleNewUser(e)}
             value={newUser?.username ?? ''}
-            className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
+            className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition"
             type="text"
             id="username"
             name="username"
+            autoComplete="username"
             required
           />
         </div>
@@ -34,10 +56,11 @@ const Signup = () => {
           <input
             onChange={(e) => handleNewUser(e)}
             value={newUser?.phone_number ?? ''}
-            className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
+            className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition"
             type="text"
             id="phone_number"
             name="phone_number"
+            autoComplete="tel"
             required
           />
         </div>
@@ -47,10 +70,11 @@ const Signup = () => {
           <input
             onChange={(e) => handleNewUser(e)}
             value={newUser?.email ?? ''}
-            className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
+            className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition"
             type="email"
             id="email"
             name="email"
+            autoComplete="email"
             required
           />
         </div>
@@ -60,10 +84,11 @@ const Signup = () => {
           <input
             onChange={(e) => handleNewUser(e)}
             value={newUser?.password ?? ''}
-            className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-200 transition"
+            className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition"
             type="password"
             id="password"
             name="password"
+            autoComplete="new-password"
             minLength={6}
             required
           />
@@ -71,10 +96,10 @@ const Signup = () => {
         </div>
 
         <div className="flex flex-col gap-3">
-          <button disabled={loading} type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-semibold shadow">
+          <Button type="submit" disabled={loading} variant="primary" className="w-full py-3">
             {loading ? 'Creating account...' : 'Create account'}
-          </button>
-          <div className="text-center text-sm text-gray-600">Already have an account? <a href="/login" className="text-red-600 font-medium hover:underline">Login</a></div>
+          </Button>
+          <div className="text-center text-sm text-gray-600">Already have an account? <a href="/login" className="text-blue-600 font-medium hover:underline">Login</a></div>
         </div>
       </form>
     </div>

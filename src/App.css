@@ -1,0 +1,47 @@
+/* src/App.css */
+
+/* Color Palette */
+:root {
+  --primary-color: #3b82f6; /* blue-600 */
+  --secondary-color: #f97316; /* orange-500 */
+  --background-color: #f3f4f6; /* gray-100 */
+  --text-color: #1f2937; /* gray-800 */
+  --light-text-color: #6b7280; /* gray-500 */
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb; /* blue-700 */
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #ea580c; /* orange-600 */
+}

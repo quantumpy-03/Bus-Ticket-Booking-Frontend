@@ -1,55 +1,44 @@
-// Razorpay configuration from environment variables
-const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID;
+/* eslint-disable no-unused-vars */
+import api from '../api/api'
 
-if (!RAZORPAY_KEY_ID) {
-  console.warn('VITE_RAZORPAY_KEY_ID is not configured in environment variables')
-}
-
-// Script loading cache
-let scriptLoadPromise = null;
-let isScriptLoaded = false;
-
-// Function to load Razorpay script with caching and retry logic
-export const loadRazorpayScript = (retries = 3) => {
-  // Return cached promise if already loading or loaded
-  if (scriptLoadPromise) {
-    return scriptLoadPromise
-  }
-
-  if (isScriptLoaded && window.Razorpay) {
+// Load the Razorpay script dynamically
+const loadRazorpayScript = () => {
+  const scriptId = 'razorpay-checkout-script'
+  if (document.getElementById(scriptId)) {
     return Promise.resolve(true)
   }
 
-  scriptLoadPromise = new Promise((resolve) => {
-    const attemptLoad = (attemptsLeft) => {
-      const script = document.createElement('script')
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js'
-      script.async = true
-      
-      script.onload = () => {
-        isScriptLoaded = true
-        scriptLoadPromise = null
-        resolve(true)
-      }
-      
-      script.onerror = () => {
-        if (attemptsLeft > 0) {
-          console.warn(`Failed to load Razorpay script. Retrying... (${retries - attemptsLeft + 1}/${retries})`)
-          setTimeout(() => attemptLoad(attemptsLeft - 1), 1000)
-        } else {
-          console.error('Failed to load Razorpay script after retries')
-          scriptLoadPromise = null
-          resolve(false)
-        }
-      }
-      
-      document.body.appendChild(script)
-    }
-
-    attemptLoad(retries)
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script')
+    script.id = scriptId
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+    script.onload = () => resolve(true)
+    script.onerror = () => reject(new Error('Razorpay SDK failed to load.'))
+    document.body.appendChild(script)
   })
+}
 
-  return scriptLoadPromise
+// Get Razorpay Key ID from environment variables
+const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID
+
+const createOrder = async (bookingData) => {
+  try {
+    const response = await api.post('/payments/create-order/', bookingData)
+    return response.data
+  } catch (error) {
+    console.error('Error creating Razorpay order:', error.response?.data)
+    throw new Error('Failed to create payment order.')
+  }
+}
+
+const verifyPayment = async (paymentData) => {
+  try {
+    const response = await api.post('/payments/verify/', paymentData)
+    return response.data
+  } catch (error) {
+    console.error('Error verifying payment:', error.response?.data)
+    throw new Error('Payment verification failed.')
+  }
 }
 
 // Function to initiate Razorpay payment
@@ -93,48 +82,47 @@ export const initiatePayment = async ({
     return
   }
 
-  const scriptLoaded = await loadRazorpayScript()
-  if (!scriptLoaded) {
-    onError('Failed to load payment gateway. Please try again.')
-    return
-  }
-
-  const options = {
-    key: RAZORPAY_KEY_ID,
-    amount: amount * 100, // Razorpay expects amount in paise (multiply by 100)
-    currency,
-    name: 'BookingApp',
-    description: `Bus Booking${orderId ? ' - Order ' + orderId : ''}`,
-    prefill: {
-      email: userEmail,
-      name: userName,
-    },
-    theme: {
-      color: '#f59e0b', // Amber color to match your app
-    },
-    handler: function (response) {
-      onSuccess({
-        paymentId: response.razorpay_payment_id,
-        orderId: response.razorpay_order_id,
-        signature: response.razorpay_signature,
-      })
-    },
-    modal: {
-      ondismiss: function () {
-        onError('Payment cancelled by user')
-      },
-    },
-  }
-
-  // Only include order_id if it looks like a real Razorpay order id
-  if (orderId && String(orderId).startsWith('order_')) {
-    options.order_id = orderId
-  }
-
   try {
+    const script = await loadRazorpayScript()
+    if (!script) {
+      onError('Could not load payment gateway script.')
+      return
+    }
+
+    const options = {
+      key: RAZORPAY_KEY_ID,
+      amount: amount, // Expect amount to be in paise
+      currency,
+      name: 'Bus Ticket Booking',
+      description: 'Payment for your bus booking',
+      order_id: orderId,
+      handler: function (response) {
+        onSuccess({
+          paymentId: response.razorpay_payment_id,
+          orderId: response.razorpay_order_id,
+          signature: response.razorpay_signature,
+        })
+      },
+      prefill: {
+        name: userName,
+        email: userEmail,
+      },
+      theme: {
+        color: '#3399cc',
+      },
+    }
+
     const rzp = new window.Razorpay(options)
+    rzp.on('payment.failed', function (response) {
+      console.error('Razorpay payment failed:', response.error)
+      const reason = response.error.reason || 'unknown'
+      const description = response.error.description || 'An unknown error occurred.'
+      onError(`Payment failed: ${description} (reason: ${reason})`)
+    })
+
     rzp.open()
   } catch (error) {
-    onError('Failed to open payment gateway: ' + error.message)
+    console.error("Error in initiating payment:", error)
+    onError("An unexpected error occurred while setting up the payment.")
   }
 }
