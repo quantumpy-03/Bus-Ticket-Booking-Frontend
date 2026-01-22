@@ -62,7 +62,7 @@ const Home = () => {
       </section>
 
       {/* Best Deals & Offers */}
-      <section>
+      <section className='p-4 lg:p-8'>
         <h2 className='text-4xl font-bold mb-8 text-center text-gray-800'>Best Deals & Offers</h2>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
           <div className="relative rounded-lg shadow-lg overflow-hidden text-white p-8 flex flex-col justify-end h-80" style={{ backgroundImage: `url('/images/best_deals/Weekend_Gateway.jpg')`, backgroundSize: 'cover' }}>
@@ -83,7 +83,7 @@ const Home = () => {
       </section>
 
       {/* Why Choose Busline? */}
-      <section className='p-2 sm:p-4 lg:p-8 mb-4 bg-blue-50 rounded-lg '>
+      <section className='p-4 lg:p-8 mb-4 bg-blue-50 rounded-lg '>
         <h2 className='text-4xl font-bold mb-10 text-center text-gray-800'>Why Choose Busline?</h2>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center'>
           {[
