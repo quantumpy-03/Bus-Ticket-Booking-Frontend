@@ -16,7 +16,7 @@ const Booking = () => {
   const [step, setStep] = useState(1)
   const [uniqueCities, setUniqueCities] = useState({ origins: [], destinations: [] })
   const navigate = useNavigate()
-  const { user } = useContext(DataContext)
+  const { user, createBooking, fetchBookings } = useContext(DataContext)
 
   // Load all routes on component mount
   useEffect(() => {
@@ -118,14 +118,14 @@ const Booking = () => {
 
     setLoading(true)
     try {
-      const bookingRes = await api.post('/book/', {
+      const bookingRes = await createBooking({
         bus: form.bus,
         seats_booked: Number(form.seats),
         start_location: form.start_location,
         drop_location: form.drop_location,
         travel_date: form.travel_date,
       })
-      const bookingId = bookingRes.data.id
+      const bookingId = bookingRes.id
 
       const orderRes = await api.post('/payments/create-order/', {
         booking_id: bookingId,
@@ -147,6 +147,9 @@ const Booking = () => {
               razorpay_order_id: paymentResponse.orderId,
               razorpay_signature: paymentResponse.signature,
             })
+            if (user) {
+                await fetchBookings();
+            }
             alert('Booking confirmed! Payment received.')
             setForm({ bus: '', seats: 1, notes: '', start_location: '', drop_location: '', travel_date: '' })
             setStep(1)
@@ -404,7 +407,8 @@ const Booking = () => {
             <h3 className="font-bold text-gray-800 mb-3">Why Book with Us?</h3>
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex items-center gap-2"><FaCheck className="text-green-600" /> Best prices guaranteed</li>
-              <li className="flex items-center gap-2"><FaCheck className="text-green-600" /> Secure payment</li>
+              <li className="flex items-center gap-2
+              "><FaCheck className="text-green-600" /> Secure payment</li>
               <li className="flex items-center gap-2"><FaCheck className="text-green-600" /> Easy cancellation</li>
               <li className="flex items-center gap-2"><FaCheck className="text-green-600" /> 24/7 support</li>
             </ul>

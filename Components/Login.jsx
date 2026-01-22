@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react'
 import DataContext from '../Context/DataContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Button from './Button';
 
 const Login = () => {
@@ -69,15 +69,19 @@ const Login = () => {
            required
          />
        </div>
-
-       <Button
-         type="submit"
-         disabled={loading}
-         variant="primary"
-         className="w-full py-3"
-       >
-         {loading ? 'Signing In...' : 'Sign In'}
-       </Button>
+       
+       <div className="flex flex-col gap-3">
+        <Button
+          type="submit"
+          disabled={loading}
+          variant="primary"
+          className="w-full py-3"
+        >
+          {loading ? 'Signing In...' : 'Sign In'}
+        </Button>
+        
+        <div className="text-center text-sm text-gray-600">Already have an account? <Link to="/signup" className="text-blue-600 font-medium hover:underline">Signup</Link></div>
+      </div>
      </form>
     </div>
   )

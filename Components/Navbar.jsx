@@ -2,13 +2,14 @@ import React, { useContext, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import DataContext from '../Context/DataContext';
 import { FaBus, FaBars, FaTimes } from 'react-icons/fa';
+import Button from './Button';
 
 const NavItem = ({ to, children }) => (
   <NavLink
     to={to}
     className={({ isActive }) =>
       `px-3 py-2 rounded-md font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-600 ${
-        isActive ? 'text-blue-700' : 'text-gray-600 hover:text-blue-700'
+        isActive ? 'text-blue-700 ring-2 ring-blue-600' : 'text-gray-600 hover:text-blue-700'
       }`
     }
   >
@@ -61,18 +62,12 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-2">
           {isAuthenticated ? (
             <>
-              <NavLink
-                to="/profile"
-                className="bg-blue-600 text-white px-4 py-2 rounded-md font-bold hover:bg-blue-700 transition"
-              >
+              <Button to="/profile" variant="primary">
                 Profile
-              </NavLink>
-              <button
-                onClick={logout}
-                className="px-4 py-2 rounded-md bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition"
-              >
+              </Button>
+              <Button onClick={logout} variant="ghost">
                 Logout
-              </button>
+              </Button>
             </>
           ) : (
             <>
@@ -110,27 +105,26 @@ const Navbar = () => {
             <div className="px-2 space-y-2">
               {isAuthenticated ? (
                 <>
-                  <NavLink to="/profile" className="block w-full text-left bg-blue-600 text-white px-4 py-2 rounded-md font-bold hover:bg-blue-700 transition" onClick={closeMobileMenu}>
-                    Profile
-                  </NavLink>
-                  <button
+                  <div onClick={closeMobileMenu}>
+                    <Button to="/profile" variant="primary" className="w-full justify-start">
+                      Profile
+                    </Button>
+                  </div>
+                  <Button
                     onClick={() => {
                       logout();
                       closeMobileMenu();
                     }}
-                    className="block w-full text-left px-4 py-2 rounded-md bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition"
+                    variant="ghost"
+                    className="w-full justify-start"
                   >
                     Logout
-                  </button>
+                  </Button>
                 </>
               ) : (
                 <>
-                  <NavLink to="/login" className="block w-full text-left px-4 py-2 rounded-md font-medium text-gray-600 hover:text-blue-700 transition" onClick={closeMobileMenu}>
-                    Login
-                  </NavLink>
-                  <NavLink to="/signup" className="block w-full text-left bg-blue-600 text-white px-4 py-2 rounded-md font-bold hover:bg-blue-700 transition" onClick={closeMobileMenu}>
-                    Sign Up
-                  </NavLink>
+                  <AuthLink to="/login">Login</AuthLink>
+                  <AuthLink to="/signup">Sign Up</AuthLink>
                 </>
               )}
             </div>

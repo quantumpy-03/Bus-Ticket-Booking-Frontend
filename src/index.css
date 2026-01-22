@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Geom:ital,wght@0,300..900;1,300..900&display=swap');
+
 @import "tailwindcss";
 
 @layer base {
@@ -5,11 +7,13 @@
     height: 100%; 
   }
   body {
-    background-image: linear-gradient(to bottom, rgb(249, 250, 251), rgb(243, 244, 246));
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  }
+   background-image: linear-gradient(to bottom, rgba(174, 205, 255, 0.1), rgba(174, 205, 255, 0.1));
+   font-family: 'Geom', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+ }
 }
 
-@layer components {
-  
+@layer utilities {
+  .text-shadow-black {
+    text-shadow: 2px 2px 4px rgb(0, 0, 0);
+  }
 }

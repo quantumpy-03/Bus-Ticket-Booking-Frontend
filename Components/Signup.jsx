@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect } from 'react';
 import DataContext from '../Context/DataContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Button from './Button';
 
 const Signup = () => {
@@ -99,7 +99,7 @@ const Signup = () => {
           <Button type="submit" disabled={loading} variant="primary" className="w-full py-3">
             {loading ? 'Creating account...' : 'Create account'}
           </Button>
-          <div className="text-center text-sm text-gray-600">Already have an account? <a href="/login" className="text-blue-600 font-medium hover:underline">Login</a></div>
+          <div className="text-center text-sm text-gray-600">Already have an account? <Link to="/login" className="text-blue-600 font-medium hover:underline">Login</Link></div>
         </div>
       </form>
     </div>

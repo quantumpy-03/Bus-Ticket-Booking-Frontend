@@ -29,15 +29,15 @@ const Home = () => {
         <h2 className='text-4xl font-bold mb-8 text-center text-gray-800'>Popular Destinations</h2>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
           {[
-            { name: 'New York', image: '/images/dest-ny.jpg' },
-            { name: 'Los Angeles', image: '/images/dest-la.jpg' },
-            { name: 'Chicago', image: '/images/dest-chicago.jpg' },
-            { name: 'Las Vegas', image: '/images/dest-vegas.jpg' },
+            { name: 'New York', image: '/images/popular/newyork.jpg' },
+            { name: 'Los Angeles', image: '/images/popular/losangeles.jpg' },
+            { name: 'Chicago', image: '/images/popular/chicago.jpg' },
+            { name: 'Las Vegas', image: '/images/popular/lasvegas.jpg' },
           ].map((dest, i) => (
-            <div key={i} className='relative rounded-lg shadow-lg overflow-hidden h-64'>
-              <img src={dest.image} alt={dest.name} className='w-full h-full object-cover' />
-              <div className='absolute inset-0 bg-black bg-opacity-40 flex items-end p-4'>
-                <h3 className='text-white text-2xl font-bold'>{dest.name}</h3>
+            <div key={i} className='relative rounded-lg shadow-lg overflow-hidden h-64 group hover:cursor-pointer'>
+              <img src={dest.image} alt={dest.name} className='w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105 ' />
+              <div className='absolute inset-0 bg-opacity-40 flex items-end'>
+                 <h3 className='text-white text-2xl font-extrabold bg-blue-600 w-full px-4 py-2'>{dest.name}</h3>
               </div>
             </div>
           ))}
@@ -45,7 +45,7 @@ const Home = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className='bg-gray-100 rounded-lg p-12 md:p-4 lg:p-8'>
+      <section className='p-4 lg:p-8 bg-blue-50 rounded-lg'>
         <h2 className='text-4xl font-bold mb-8 text-center text-gray-800'>How It Works</h2>
         <div className='grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-6 lg:gap-8 text-center'>
           {[
@@ -65,19 +65,17 @@ const Home = () => {
       <section>
         <h2 className='text-4xl font-bold mb-8 text-center text-gray-800'>Best Deals & Offers</h2>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-          <div className="relative rounded-lg shadow-lg overflow-hidden text-white p-8 flex flex-col justify-end h-80" style={{ backgroundImage: `url('/images/deal-1.jpg')`, backgroundSize: 'cover' }}>
-            <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+          <div className="relative rounded-lg shadow-lg overflow-hidden text-white p-8 flex flex-col justify-end h-80" style={{ backgroundImage: `url('/images/best_deals/Weekend_Gateway.jpg')`, backgroundSize: 'cover' }}>
             <div className="relative z-10">
-              <h3 className="text-3xl font-bold">Weekend Getaway</h3>
-              <p className="text-xl mb-4">Up to <span className="font-bold text-orange-400">30% Off</span></p>
+              <h3 className="text-3xl font-bold text-shadow-black">Weekend Getaway</h3>
+              <p className="text-xl mb-4 text-shadow-black">Up to <span className="font-bold text-orange-400">30% Off</span></p>
               <Link to="/booking" className="bg-orange-500 text-white font-bold py-2 px-4 rounded hover:bg-orange-600">View Offers</Link>
             </div>
           </div>
-          <div className="relative rounded-lg shadow-lg overflow-hidden text-white p-8 flex flex-col justify-end h-80" style={{ backgroundImage: `url('/images/deal-2.jpg')`, backgroundSize: 'cover' }}>
-            <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+          <div className="relative rounded-lg shadow-lg overflow-hidden text-white p-8 flex flex-col justify-end h-80" style={{ backgroundImage: `url('/images/best_deals/City_Break_Special.jpg')`, backgroundSize: 'cover' }}>
             <div className="relative z-10">
-              <h3 className="text-3xl font-bold">City Break Specials</h3>
-              <p className="text-xl mb-4">Save up to <span className="font-bold text-orange-400">25%</span></p>
+              <h3 className="text-3xl font-bold text-shadow-black">City Break Specials</h3>
+              <p className="text-xl mb-4 text-shadow-black">Save up to <span className="font-bold text-orange-400">25%</span></p>
               <Link to="/booking" className="bg-orange-500 text-white font-bold py-2 px-4 rounded hover:bg-orange-600">View Deals</Link>
             </div>
           </div>
@@ -85,7 +83,7 @@ const Home = () => {
       </section>
 
       {/* Why Choose Busline? */}
-      <section className='bg-gray-100 rounded-lg p-2 sm:p-4 lg:p-8'>
+      <section className='p-2 sm:p-4 lg:p-8 mb-4 bg-blue-50 rounded-lg '>
         <h2 className='text-4xl font-bold mb-10 text-center text-gray-800'>Why Choose Busline?</h2>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center'>
           {[

@@ -14,6 +14,7 @@ import Destinations from '../Components/Destinations.jsx';
 import AboutUs from '../Components/AboutUs.jsx';
 import Support from '../Components/Support.jsx';
 import { DataProvider } from '../Context/DataContext.jsx';
+import NotFound from '../Components/NotFound.jsx';
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
     errorElement: <div>Oops! Page not found.</div>,
     children: [
       { index: true, element: <Home /> },
+      { path: '*', element: <NotFound /> },
       { path: 'login', element: <Login /> },
       { path: 'signup', element: <Signup /> },
       { path: 'destinations', element: <Destinations /> },

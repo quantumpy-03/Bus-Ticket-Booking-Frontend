@@ -76,12 +76,12 @@ export const DataProvider = ({ children }) => {
         setUserLogin({ username: '', password: '' })
     }, [navigate]);
 
-    const fetchBookings = useCallback(async (userId) => {
+    const fetchBookings = useCallback(async (orderBy = '-booking_date') => {
         try {
-            const response = await api.get(`/book/?user_id=${userId}`);
+            const response = await api.get(`/book/?ordering=${orderBy}`);
             setBookings(response.data || []);
         } catch (error) {
-            console.error("Failed to fetch bookings:", error);
+            console.error(`Failed to fetch bookings ordered by ${orderBy}:`, error);
         }
     }, []);
 
@@ -94,7 +94,7 @@ export const DataProvider = ({ children }) => {
                     const response = await api.get('/profile/');
                     setUser(response.data);
                     setIsAuthenticated(true);
-                    fetchBookings(response.data.id);
+                    fetchBookings();
                 } catch {
                     logout();
                 }
@@ -122,7 +122,7 @@ export const DataProvider = ({ children }) => {
             setUser(user);
             
             setIsAuthenticated(true);
-            await fetchBookings(user.id);
+            await fetchBookings();
             
             navigate('/');
 
@@ -226,6 +226,12 @@ export const DataProvider = ({ children }) => {
         }
     };
 
+    const createBooking = async (bookingData) => {
+        const response = await api.post('/book/', bookingData);
+        const newBooking = response.data;
+        return newBooking;
+    };
+
 
     return (
         <DataContext.Provider
@@ -249,6 +255,8 @@ export const DataProvider = ({ children }) => {
                 resetCancellation,
                 cancelBooking,
                 updateUserProfile,
+                createBooking,
+                fetchBookings,
             }}
         >
             {children}

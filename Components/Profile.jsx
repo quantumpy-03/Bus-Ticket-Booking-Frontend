@@ -65,7 +65,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="bg-gray-100/50 flex justify-center items-center">
+    <div className="flex justify-center items-center">
       <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 md:p-8">
         <div className="flex items-center mb-6">
             <span className="w-1 h-5 bg-blue-600 rounded-full mr-2"></span>
