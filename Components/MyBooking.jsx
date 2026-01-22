@@ -63,8 +63,8 @@ const MyBooking = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-2 sm:p-4 lg:p-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-800">My Bookings</h1>
+      <div className="flex flex-col sm:flex-row gap-5 justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold text-gray-800 m-0">My Bookings</h1>
         <div className="flex space-x-8">
           <Button
             onClick={() => handleSort(activeSort === '-booking_date' ? 'booking_date' : '-booking_date')}

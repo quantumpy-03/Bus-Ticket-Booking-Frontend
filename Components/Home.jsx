@@ -53,7 +53,7 @@ const Home = () => {
             { title: 'Book Your Ticket', desc: 'Secure your seat with easy online booking.' },
             { title: 'Enjoy Your Trip', desc: 'Travel comfortably to your destination.' },
           ].map((item, i) => (
-            <div key={i} className='bg-white p-6 rounded-lg shadow-md transform transition-transform duration-300 hover:scale-105 hover:shadow-xl hover:cursor-default'>
+            <div key={i} className='bg-white p-6 rounded-lg shadow-md transform transition-transform duration-300 hover:scale-105 hover:shadow-xl active:scale-105 active:shadow-xl hover:cursor-default'>
               <h3 className='font-bold text-xl text-gray-800 mb-2'>{item.title}</h3>
               <p className='text-gray-600'>{item.desc}</p>
             </div>
