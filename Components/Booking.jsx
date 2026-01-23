@@ -172,7 +172,7 @@ const Booking = () => {
 
   return (
     <div className="max-w-5xl mx-auto mt-6 p-2 sm:p-4 lg:p-8">
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Booking Form */}
         <div className="md:col-span-2">
           <div className="bg-white rounded-lg shadow-lg p-6">
@@ -281,7 +281,7 @@ const Booking = () => {
                   </select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col">
                     <label htmlFor="seats" className="text-sm font-semibold text-gray-700 mb-2">Number of Seats *</label>
                     <input
@@ -324,7 +324,7 @@ const Booking = () => {
                   />
                 </div>
 
-                <div className="flex items-center justify-between gap-3 pt-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4">
                   <Button 
                     type="button" 
                     variant="outline"

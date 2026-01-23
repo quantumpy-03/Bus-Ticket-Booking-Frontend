@@ -7,7 +7,7 @@ const Home = () => {
     <div className='space-y-16'>
       {/* Hero Section */}
       <section
-        className='rounded-lg shadow-xl text-white flex items-center'
+        className='shadow-xl text-white flex items-center'
         style={{
           backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.2)), url('/images/landing.jpg')`,
           backgroundSize: 'cover',
@@ -35,7 +35,7 @@ const Home = () => {
             { name: 'Las Vegas', image: '/images/popular/lasvegas.jpg' },
           ].map((dest, i) => (
             <div key={i} className='relative rounded-lg shadow-lg overflow-hidden h-64 group hover:cursor-pointer'>
-              <img src={dest.image} alt={dest.name} className='w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105 ' />
+              <img src={dest.image} alt={dest.name} className='w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105 group-active:scale-105' />
               <div className='absolute inset-0 bg-opacity-40 flex items-end'>
                  <h3 className='text-white text-2xl font-extrabold bg-blue-600 w-full px-4 py-2'>{dest.name}</h3>
               </div>
@@ -83,7 +83,7 @@ const Home = () => {
       </section>
 
       {/* Why Choose Busline? */}
-      <section className='p-4 lg:p-8 mb-4 bg-blue-50 rounded-lg '>
+      <section className='p-4 lg:p-8 pb-4 bg-blue-50 rounded-lg '>
         <h2 className='text-4xl font-bold mb-10 text-center text-gray-800'>Why Choose Busline?</h2>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center'>
           {[
