@@ -6,6 +6,8 @@ import { useContext } from 'react'
 import DataContext from '../Context/DataContext'
 import { FaHourglass, FaCheck, FaArrowRight, FaArrowDown, FaArrowLeft, FaMapMarkerAlt } from 'react-icons/fa'
 import Button from './Button'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 
 const Booking = () => {
   const [form, setForm] = useState({ bus: '', seats: 1, notes: '', start_location: '', drop_location: '', travel_date: '' })
@@ -47,6 +49,10 @@ const Booking = () => {
   const handleChange = (e) => {
     const { name, value } = e.target
     setForm(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleDateChange = (date) => {
+    setForm(prev => ({ ...prev, travel_date: date }))
   }
 
   // Step 1: Handle route selection and load buses
@@ -123,7 +129,7 @@ const Booking = () => {
         seats_booked: Number(form.seats),
         start_location: form.start_location,
         drop_location: form.drop_location,
-        travel_date: form.travel_date,
+        travel_date: form.travel_date.toISOString().split('T')[0],
       })
       const bookingId = bookingRes.id
 
@@ -298,15 +304,14 @@ const Booking = () => {
 
                   <div className="flex flex-col">
                     <label htmlFor="travel_date" className="text-sm font-semibold text-gray-700 mb-2">Travel Date *</label>
-                    <input
+                    <DatePicker
                       id="travel_date"
-                      name="travel_date"
-                      type="date"
-                      value={form.travel_date}
-                      onChange={handleChange}
+                      selected={form.travel_date}
+                      onChange={handleDateChange}
                       required
-                      min={(() => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split('T')[0]; })()}
-                      className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition"
+                      minDate={new Date(new Date().setDate(new Date().getDate() + 1))}
+                      className="border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition w-full"
+                      placeholderText="Select a date"
                     />
                   </div>
                 </div>
@@ -403,7 +408,7 @@ const Booking = () => {
           )}
          
           {/* Features */}
-          <div className="bg-blue-50 rounded-lg p-6 border-l-4 border-blue-600">
+          <div className="bg-blue-50 rounded-lg mb-4 sm:mb-0 p-6 border-l-4 border-blue-600">
             <h3 className="font-bold text-gray-800 mb-3">Why Book with Us?</h3>
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex items-center gap-2"><FaCheck className="text-green-600" /> Best prices guaranteed</li>

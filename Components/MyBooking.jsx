@@ -52,7 +52,7 @@ const MyBooking = () => {
       if (booking.payment_status === 'completed') {
         return { text: 'CONFIRMED', className: 'bg-green-100 text-green-800' };
       }
-      return { text: 'PAYMENT PENDING', className: 'bg-yellow-100 text-yellow-800' };
+      return { text: 'PENDING', className: 'bg-yellow-100 text-yellow-800' };
     }
     return { text: booking.status, className: 'bg-gray-100 text-gray-800' };
   };
@@ -65,7 +65,7 @@ const MyBooking = () => {
     <div className="max-w-7xl mx-auto p-2 sm:p-4 lg:p-8">
       <div className="flex flex-col sm:flex-row gap-5 justify-between items-center mb-8">
         <h1 className="text-4xl font-bold text-gray-800 m-0">My Bookings</h1>
-        <div className="flex space-x-8">
+        <div className="flex flex-row max-[331px]:flex-col max-[331]:justify-between max-[331px]:space-y-4 min-[331px]:space-x-8">
           <Button
             onClick={() => handleSort(activeSort === '-booking_date' ? 'booking_date' : '-booking_date')}
             variant={activeSort.includes('booking_date') ? 'primary' : 'outline'}
@@ -113,28 +113,28 @@ const MyBooking = () => {
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-4 gap-x-2">
                         <div>
                             <p className="text-sm text-gray-500">Bus Operator</p>
-                            <p className="text-lg font-semibold text-gray-900">{busDetails.owner || 'N/A'}</p>
+                            <p className="text-md md:text-lg font-semibold text-gray-900">{busDetails.owner || 'N/A'}</p>
                         </div>
                         <div>
                             <p className="text-sm text-gray-500">Bus Name</p>
-                            <p className="text-lg font-semibold text-gray-900">{busDetails.name || 'N/A'}</p>
+                            <p className="text-md md:text-lg font-semibold text-gray-900">{busDetails.name || 'N/A'}</p>
                         </div>
                         <div>
                             <p className="text-sm text-gray-500">Seats Booked</p>
-                            <p className="text-lg font-semibold text-gray-900">{booking.seats_booked || 0}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm text-gray-500">From</p>
-                            <p className="text-lg font-semibold text-gray-900">{booking.start_location}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm text-gray-500">To</p>
-                            <p className="text-lg font-semibold text-gray-900">{booking.drop_location}</p>
+                            <p className="text-md md:text-lg font-semibold text-gray-900">{booking.seats_booked || 0}</p>
                         </div>
                         <div>
                             <p className="text-sm text-gray-500">Travel Date</p>
-                            <p className="text-lg font-semibold text-gray-900">{new Date(booking.travel_date).toLocaleDateString()}</p>
+                            <p className="text-md md:text-lg font-semibold text-gray-900">{new Date(booking.travel_date).toLocaleDateString()}</p>
                         </div>
+                        <div>
+                            <p className="text-sm text-gray-500">From</p>
+                            <p className="text-md md:text-lg font-semibold text-gray-900">{booking.start_location}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm text-gray-500">To</p>
+                            <p className="text-md md:text-lg font-semibold text-gray-900">{booking.drop_location}</p>
+                        </div>                        
                     </div>
                   </div>
 
@@ -142,11 +142,11 @@ const MyBooking = () => {
                     <div className='grid grid-cols-2 md:grid-cols-1 gap-y-4 gap-x-2'>
                       <div>
                         <p className="text-sm text-gray-500">Amount</p>
-                        <p className="text-2xl font-bold text-red-600">₹{(Number(booking.amount) || (busesMap[booking.bus]?.price * booking.seats_booked) || 0).toFixed(2)}</p>
+                        <p className="text-md md:text-2xl font-bold text-red-600">₹{(Number(booking.amount) || (busesMap[booking.bus]?.price * booking.seats_booked) || 0).toFixed(2)}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-500">Booking Status</p>
-                        <span className={`px-3 py-1 text-sm font-semibold rounded-full ${displayDetails.className}`}>
+                        <span className={`px-3 py-1 text-sm md:text-md font-semibold rounded-full ${displayDetails.className}`}>
                           {displayDetails.text}
                         </span>
                       </div>
